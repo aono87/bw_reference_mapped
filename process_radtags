@@ -1,0 +1,11 @@
+#### process_radtags with test BW pilot data ####
+
+### truncating to 150bp, using standard QC threshold of 10
+process_radtags -1 ./raw/Md_PE_012_1.fastq.gz -2 ./raw/Md_PE_012_2.fastq.gz -o ./stacks/pilot_md -b ./barcodes/barcodes.txt --renz_1 hindIII --renz_2 mspI -t 150 -i gzfastq -y gzfastq
+
+###to note, barcode file must be tab delimmited. make in excel and save as a tab delimited text file
+
+##changed names to fastq insead of samfastq
+
+### running again with higher qc value of 20 and truncating to 130bp to match IWC report
+process_radtags -1 ./raw/Md_PE_012_1.fastq.gz -2 ./raw/Md_PE_012_2.fastq.gz -o ./stacks/pilot_md -b ./barcodes/barcodes.txt --renz_1 hindIII --renz_2 mspI -t 130 -s 20  -i gzfastq -y gzfastq
