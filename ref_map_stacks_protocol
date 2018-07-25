@@ -7,7 +7,9 @@ I will explain the steps in the same way i keep files organised in my Dropbox fo
 The protocol is broken up into the following steps (and directories in Dropbox)
 
 General notes to consider before starting pipeline:
--Sample names: it will make your life a lot easier down the line if samples are given a uniform format. This will be especially important during loops when you are trying to extract some information or add info such as the Read Groups. The format I use is "SequencingLane_Library_SampleNumber". The raw sequence filenames were also simplified from their Illumina names before beginning as well. Keep a clear record of any name recodings that are done. 
+-Sample names: it will make your life a lot easier down the line if samples are given a uniform format. This will be especially important during loops when you are trying to extract some information or add info such as the Read Groups. The format I use is "SequencingLane_Library-SampleNumber". The raw sequence filenames were also simplified from their Illumina names before beginning as well. Keep a clear record of any name recodings that are done. 
+
+-Popmap file: it will be easier later on if your samples are organised by population in your popmap file. This will make it easier later when you are plotting things like coverage and missingness by indivdual and colouring based on population. 
 
 1. barcodes
 
@@ -126,3 +128,68 @@ Example code for adding Read Groups to sorted .bam files taken from inside a loo
 ##       RGSM=$NAME
 ##       done
 
+6. gstacks
+
+This step takes the reference map aligned, sorted and read group added .bam files and runs them through the "gstacks" module in Stacks. This program builds loci from single and/or paired-end reads before calling SNPs. The reads must be aligned and stored in a single .bam file and the reads MUST be sorted. 
+
+This program also needs a "popmap.txt" file that defines any populations that indivuals are from. As in the barcode file, these must be tab delimited and be 
+
+Example popmap.txt file:
+
+## BWLib_L3-7	spa
+## Mde_L6_46	nat
+## Zcav20181_L2-12	nat
+## Zcav20181_L2-17	med
+## Zcav20181_L3-26	nat
+## Zcav20181_L3-27	spa
+## Zcav20181_L3-28	spa
+## Zcav20181_L4-31	spa
+## Zcav20181_L4-33	nat
+
+There are several parameters within gstacks that can be modified and the intial analysis must include a step optimising which parameters give the greatest number of SNPs in the greatest number of indivdiuals. The four parameters that will be changed are:
+
+--min-mapq: the minimum PHRED-scaled mapping quality to consider a read (10 or 20)
+--max-clipped: maximum soft-clipping level in fraction of read length (0.1 or 0.2)
+--var-alpha: alpha threshold for discovering SNPs (0.05 or 0.01)
+--gt-alpha: alpha threshold for calling genotypes (0.05 or 0.01)
+
+The gstacks program should be run for all samples selected for parameter optimisation at every iteration of those four parameters (n=16). This can be done inside a loop and will generate one set of outputs for each combination of parameters. 
+
+Example code to run gstacks taken from inside a loop:
+
+## gstacks -I alignments/zcav_aln_zcav/all_SRG/         \
+## -M popmap_zcav.txt                                   \
+## -O tests.reference/zcav_aln_zcav_gstacks/4var_20.6.18/\
+## Trial_mapq${var_m}_clip${var_c}_varalpha${var_alpha}_gtalpha${var_gta}/ \
+## --max-clipped ${var_c} --min-mapq ${var_m} --var-alpha ${var_alpha} --gt-alpha ${var_gta} -t 8
+
+7. populations
+
+This program in stacks with analyse a predefinted population of individual samples and calculate population genetics statistics and export standard output formats (such as SNP files in .vfc format). This program can compute pstatistics at aeach nucleotide position and between individuals and populations for statistics such as Fst. This program can also filter sites/loci based on certain allele frequencies in each population or metapopulation and can accept white and blacklists or specific loci to include or not include. In this run of populations, we only allowed sites with a minimum minor allele frequency of 0.0125 (which is 1/80, indicating that an allele is present in at least one of my 40 individuals). 
+
+Example code to run populations taken from inside a loop using the output files from gstacks and the popmap file from before. :
+
+## populations -P ./tests.reference/zcav_aln_zcav_gstacks/4var_20.6.18/\
+##   Trial_mapq${var_m}_clip${var_c}_varalpha${var_alpha}_gtalpha${var_gta}/ \
+## 	-M ./popmap_zcav.txt \
+## 	-O ./tests.reference/zcav_aln_zcav_populations/\
+##   Trial_mapq${var_m}_clip${var_c}_varalpha${var_alpha}_gtalpha${var_gta} \
+##   --vcf -t 8 --min_maf 0.0125
+
+8. Filtering SNPs
+
+This step includes a series of commands in both unix and R to filter out loci and indivdiuals based on the SNPS output in a .vcf file from populations. This first uses a unix shell script to move through the different folders for different parameter options and then switches to an R script that can be run on all parameter sets. The unix code within the Rscript uses the program "vcftools" to extract and filter information from the .vcf files. This is done one filtering step at a time, and writing a new .vcf file each time. The filtering steps are:
+
+-filter genotypes with a quality <20 and a minimum depth of 5
+-filter out any sites with a minor allele frequency <0.001
+-filter out any sites with >50% missing data
+-filter out any individuals with >50% missing data
+-filter out loci with mean site depth >3x the overall mean
+-filter out sites with >75% missing data
+-filter out individuals with >25% missing data
+-filter out any indels
+-generate a whitelist of remaining loci that have passed filtering steps
+
+Once the final whitelist of loci is generated, a new popmap.txt must also be made where the filtered out individuals have been removed. These two files will be included in a second run through "populations". 
+
+9. The program "populations" will be run a second time on the samples that survived the first filtering stpes only using the whitelist loci that also survivived the first filtering steps. 
