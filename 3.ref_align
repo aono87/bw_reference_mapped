@@ -1,0 +1,34 @@
+###This code aligns the cleaned and demultiplexed samples from 2.process_radtags against a reference genome. This code is written to be submitted to the St Andrews Bioinformatics Unit cluster. 
+
+##In this code I divide samples up into geographic regions and aligned them in groups that way. This was not necessary and I would not do this again as it meant i just had to run the code multiple times. 
+
+##Prior to aligning, the genome must be indexed. This only needs to happen one time using the "bwa index" command. 
+
+#######Mediterranean Opt. Samples--ALIGN TO MBID GENOME#########
+##Bash script for aligning with bwa:
+################################################################################################################################################
+#!/bin/bash 
+#$ -cwd 
+#$ -j y
+#$ -S /bin/bash 
+#$ -V
+#$ -N ZcavRefOpt_med ## job name
+
+#$ -q all.q
+
+# load bwa
+module load bwa
+
+for opt in Zcav2018_1_L2_17 Zcav2018_1_L5_46 Zcav2018_1_L5_47 Zcav2018_2_L10_46 Zcav2018_2_L10_48 Zcav2018_2_L7_14 Zcav2018_3_L15_44
+
+	do
+		## shout out to sample being analysed
+		echo now analysing ${opt}
+
+		# align paired end reads to SRW genome
+		bwa mem ~/bw_bioinformatics/bw_ddrad/genome/Mbid.genome.fasta -t 5 ~/bw_bioinformatics/bw_ddrad/cleaned/1_mismatch/Zcav/$opt.1.fq.gz ~/bw_bioinformatics/bw_ddrad/cleaned/1_mismatch/Zcav/$opt.2.fq.gz >~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_mbid/med/${opt}_aln.sam  
+done
+################################################################################################################################################
+
+
+##no log file is generated after this step by the Cluster does generate a file for each submission that stores any information given by the program while its running. 
