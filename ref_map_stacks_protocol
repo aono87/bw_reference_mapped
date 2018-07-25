@@ -192,4 +192,24 @@ This step includes a series of commands in both unix and R to filter out loci an
 
 Once the final whitelist of loci is generated, a new popmap.txt must also be made where the filtered out individuals have been removed. These two files will be included in a second run through "populations". 
 
-9. The program "populations" will be run a second time on the samples that survived the first filtering stpes only using the whitelist loci that also survivived the first filtering steps. 
+9. The program "populations" will be run a second time on the samples that survived the first filtering stpes only using the whitelist loci that also survivived the first filtering steps. In this step, we also indicate that we want to use loci that are only present in all four of our populations and that are present in >80% of individuals, with a minor allele frequency >0.01. We also indicate here that we would like to output which sites are out of hardy weinberg quilibrium. 
+
+Example code taken from inside a loop:
+
+## populations 
+## -P ./tests.reference/zcav_aln_zcav_gstacks/4var_20.6.18/\
+## Trial_mapq${var_m}_clip${var_c}_varalpha${var_alpha}_gtalpha${var_gta}/ \
+## -M ./popmap_zcav_ind-removed.txt \
+## -O ./tests.reference/zcav_aln_zcav_populations/\
+## Trial_mapq${var_m}_clip${var_c}_varalpha${var_alpha}_gtalpha${var_gta}/post_qc/ \
+## -W ./tests.reference/zcav_aln_zcav_populations/\
+## Trial_mapq${var_m}_clip${var_c}_varalpha${var_alpha}_gtalpha${var_gta}/whitelistv3 \
+## -p 4 -r 0.8 --vcf --min_maf 0.01 --hwe -t 8
+
+10. As with the first set of filtering steps, these are carried out using both unix commands and R scripts. After the second run in populations, samples are processed as follows:
+
+-filter out individuals missing >25% of data
+-calculate the average and SD % missingness per individual
+-calculate the site depth of each locus
+-calculate and plot the mean site depth per locus
+-filter out loci that are out of HWE at 0.01 level. 
