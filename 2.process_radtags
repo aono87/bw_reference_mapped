@@ -1,0 +1,182 @@
+####Here is the code I used to run process_radtags on my beaked whale libraries. The loops are broken up into sequencing libraries due to inconsistent naming. This is just more evidence to show how beneficial it is to have a consistent naming pattern!
+
+##The following script is written to be submitted to the St Andrews Bioinformatics Unit Cluster
+
+### Submitting a job using a script
+#!/bin/bash
+#$-cwd  ##execute the job from the current working directory
+#$-j y  ##join error output to normal output
+#$-S /bin/bash ##shell where the cluster will run the job
+#$-V ##pass all environment variables to the job
+#$-N Mden_ddrad ##job name
+#$-q all.q ##default queue, no special requirement
+##### you can also include an option here to specify how many slots you want to use in the cluster with: #$-pe multi 8(to use 8 slots). Only do this if it computationally intensite and will otherwise take a lot of time. 
+
+
+##load stacks v2
+
+module load stacks/2.0Beta9
+
+#########0_mismatch data#################
+
+## _Mismatch data for Zcav2018 Lanes 1-3 (L1-L15)##
+##demultiplex samples for each library using unique barcodes. 
+##This loop will read each name and corresponding barcode files. 
+##Will output into ./cleaned  folder with unique log files for each
+
+##Zcav 2018 lane 1
+##start loop
+
+echo processing 0_mismatch RAD tags for Zcav lane 1 libraries 1-5
+for i in {1..5}
+	do
+	
+##process radtags code to be run for each Zcav library in Zcav2018_1 (L1-L5)##
+
+process_radtags 														\
+		-1 ./raw/0_mismatch/Zcav2018_1/Zcav2018_1_L${i}_R1.fastq.gz	            \
+       	-2 ./raw/0_mismatch/Zcav2018_1/Zcav2018_1_L${i}_R2.fastq.gz     \
+                -o ./cleaned/0_mismatch 								\
+	        -b ./info/barcodes/barcode_Zcav2018_1_L${i}.txt 					\
+		--renz_1 hindIII --renz_2 mspI 									\
+		-t 110			 												\
+		-r -q -c -D														\
+		-i gzfastq -y gzfastq
+
+##rename log file so that it isn't rewritten each time the code is run
+
+mv ./cleaned/0_mismatch/process_radtags.Zcav2018_1.log ./cleaned/0_mismatch/Zcav2018_1_L${i}_process_radtags.log
+
+done
+
+##Zcav 2018 lane 2
+##start loop
+
+echo processing 0_mismatch RAD tags for Zcav lane 2 libraries 6-10
+for i in {6..10}
+	do
+	
+##process radtags code to be run for each Zcav library in Zcav2018_2 (L6-L10)##
+
+process_radtags 														\
+		-1 ./raw/0_mismatch/Zcav2018_2/Zcav2018_2_L${i}_R1.fastq.gz	            \
+       	-2 ./raw/0_mismatch/Zcav2018_2/Zcav2018_2_L${i}_R2.fastq.gz     \
+                -o ./cleaned/0_mismatch 								\
+	        -b ./info/barcodes/barcode_Zcav2018_2_L${i}.txt 					\
+		--renz_1 hindIII --renz_2 mspI 									\
+		-t 110			 												\
+		-r -q -c -D														\
+		-i gzfastq -y gzfastq
+
+##rename log file so that it isn't rewritten each time the code is run
+
+mv ./cleaned/0_mismatch/process_radtags.Zcav2018_2.log ./cleaned/0_mismatch/Zcav2018_2_L${i}_process_radtags.log
+
+done
+
+##Zcav 2018 lane 3
+##start loop
+
+echo processing 0_mismatch RAD tags for Zcav lane 3 libraries 11-15
+for i in {11..15}
+	do
+	
+##process radtags code to be run for each Zcav library in Zcav2018_1 (L11-L15)##
+
+process_radtags 														\
+		-1 ./raw/0_mismatch/Zcav2018_3/Zcav2018_3_L${i}_R1.fastq.gz	            \
+       	-2 ./raw/0_mismatch/Zcav2018_3/Zcav2018_3_L${i}_R2.fastq.gz     \
+                -o ./cleaned/0_mismatch 								\
+	        -b ./info/barcodes/barcode_Zcav2018_3_L${i}.txt 					\
+		--renz_1 hindIII --renz_2 mspI 									\
+		-t 110			 												\
+		-r -q -c -D														\
+		-i gzfastq -y gzfastq
+
+##rename log file so that it isn't rewritten each time the code is run
+
+mv ./cleaned/0_mismatch/process_radtags.Zcav2018_3.log ./cleaned/0_mismatch/Zcav2018_3_L${i}_process_radtags.log
+
+done
+
+##BWLib L3
+
+echo processing 0_mismatch RAD tags for BWLib L3
+	
+##process radtags code to be run for each Zcav library in BWLib (L3)##
+
+process_radtags 														\
+		-1 ./raw/0_mismatch/BWLib_Lane1/BWLib_L3_R1.fastq.gz	            \
+       	-2 ./raw/0_mismatch/BWLib_Lane1/BWLib_L3_R2.fastq.gz     \
+                -o ./cleaned/0_mismatch 								\
+	        -b ./info/barcodes/barcode_BWLib_L3_Zcav.txt						\
+		--renz_1 hindIII --renz_2 mspI 									\
+		-t 110			 												\
+		-r -q -c -D														\
+		-i gzfastq -y gzfastq
+
+##rename log file so that it isn't rewritten each time the code is run
+
+mv ./cleaned/0_mismatch/process_radtags.BWLib_Lane1.log ./cleaned/0_mismatch/BWLib_Lane1_L3_Zcav.process_radtags.log
+
+##BWLib L6
+
+echo processing 0_mismatch RAD tags for BWLib L6
+	
+##process radtags code to be run for each Zcav library in BWLib (L6)##
+
+process_radtags 														\
+		-1 ./raw/0_mismatch/BWLib_Lane1/BWLib_L6_R1.fastq.gz	            \
+       	-2 ./raw/0_mismatch/BWLib_Lane1/BWLib_L6_R2.fastq.gz     \
+                -o ./cleaned/0_mismatch 								\
+	        -b ./info/barcodes/barcode_BWLib_L6_Zcav.txt						\
+		--renz_1 hindIII --renz_2 mspI 									\
+		-t 110			 												\
+		-r -q -c -D														\
+		-i gzfastq -y gzfastq
+
+##rename log file so that it isn't rewritten each time the code is run
+
+mv ./cleaned/0_mismatch/process_radtags.BWLib_Lane1.log ./cleaned/0_mismatch/BWLib_Lane1_L6_Zcav.process_radtags.log
+
+
+done
+
+
+
+
+######The following is one of the log files for an example:
+
+## process_radtags v2.0Beta9, executed 2018-05-22 10:18:38
+## process_radtags -1 ./raw/0_mismatch/Zcav2018_1/Zcav2018_1_L1_R1.fastq.gz -2 ./raw/0_mismatch/Zcav2018_1/Zcav2018_1_L1_R2.fastq.gz -o ./cleaned/0_mismatch -b ./info/barcodes/barcode_Zcav2018_1_L1.txt --renz_1 hindIII --renz_2 mspI -t 110 -r -q -c -D -i gzfastq -y gzfastq
+## File	Retained Reads	Low Quality	Ambiguous Barcodes	Ambiguous RAD-Tag	Total
+## Zcav2018_1_L1_R1.fastq.gz	10364897	5057	50518	6433784	16854256
+
+## Total Sequences	16854256
+## Ambiguous Barcodes	50518
+## Low Quality	5057
+## ## Ambiguous RAD-Tag	6433784
+## Retained Reads	10364897
+
+## Barcode	Filename	Total	NoRadTag	LowQuality	Retained
+## GCATG	Zcav2018_1_L1_1	57640	7477	22	50141
+## ACAGA	Zcav2018_1_L1_2	1637508	5871	798	1630839
+## AAGTGA	Zcav2018_1_L1_3	4972	548	3	4421
+## ATTACA	Zcav2018_1_L1_4	2414182	8328	1208	2404646
+## AGAATG	Zcav2018_1_L1_5	3329088	1677638	834	1650616
+## AGTTAA	Zcav2018_1_L1_6	2247856	1130502	519	1116835
+## CCACTG	Zcav2018_1_L1_7	3256926	1647191	750	1608985
+## AGTCAA	Zcav2018_1_L1_8	18526	14250	0	4276
+## AGTGTT	Zcav2018_1_L1_9	2062914	1046011	503	1016400
+## CACGAC	Zcav2018_1_L1_10	1774126	895968	420	877738
+
+## Sequences not recorded
+## Barcode	Total
+## CACTGG	8764
+## GTTAAT	2358
+## GTGTTA	1922
+## ACGACC	1512
+## ATTTTT	974
+## TTTTTT	882
+## ATTAAT	716
+## ....this continues on for hundreds-thousands more rows!
