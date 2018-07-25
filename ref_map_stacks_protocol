@@ -1,0 +1,128 @@
+This Protocol lists and explains all of the steps I use when processing sequences that have been aligned to a reference genome. 
+
+Most of this code has been provided by supervisor Dr. Emma Carroll and some was from Dr. Chris Hollenbeck. 
+
+I will explain the steps in the same way i keep files organised in my Dropbox folder to make it easier for future use. 
+
+The protocol is broken up into the following steps (and directories in Dropbox)
+
+General notes to consider before starting pipeline:
+-Sample names: it will make your life a lot easier down the line if samples are given a uniform format. This will be especially important during loops when you are trying to extract some information or add info such as the Read Groups. The format I use is "SequencingLane_Library_SampleNumber". The raw sequence filenames were also simplified from their Illumina names before beginning as well. Keep a clear record of any name recodings that are done. 
+
+1. barcodes
+
+Beaked whale sequences were returned to us from the lab in Copenhagen already de multiplexed by reverse index and therefore there are two files for each library, since they are paired end reads. Files are in the follwing format "xxxxx_R1.fastq.gz". Each library contains multiple samples so you must create one .txt file for each library defining the barcode that was given to each individual. Also, the sequencing center demultiplexed by reverse index two times, once with no mismatch allowance and once allowing for one mismatch in the reverse index.  
+
+A barcode file should look like this:
+
+## GCATG	Zcav2018_3_L14_31
+## ACAGA	Zcav2018_3_L14_32
+## AAGTGA	Zcav2018_3_L14_33
+## ATTACA	Zcav2018_3_L14_34
+## AGAATGA	Zcav2018_3_L14_35
+## AGTTAAT	Zcav2018_3_L14_36
+## CCACTGG	Zcav2018_3_L14_37
+## AGTCAAGA	Zcav2018_3_L14_38
+## AGTGTTAA	Zcav2018_3_L14_39
+## CACGACCA	Zcav2018_3_L14_40
+
+notes: this file must be tab delimited and it is really important to double check the barcode sequences are correct!
+
+2. process_radtags
+
+This step will demultiplex the library specific .fastq.gz files into individual sample specific .fq.gz files (one each for forward and reverse reads) using the barcode files created in step 1. This step also does some filtering and trimming as specified. This command is run in Stacks on the command line. 
+
+Example code takin from inside a loop:
+
+## process_radtags 													                                	\
+## 		-1 ./raw/0_mismatch/Zcav2018_1/Zcav2018_1_L${i}_R1.fastq.gz	            \
+##        	-2 ./raw/0_mismatch/Zcav2018_1/Zcav2018_1_L${i}_R2.fastq.gz       \
+##                -o ./cleaned/0_mismatch 							                     	\
+## 	        -b ./info/barcodes/barcode_Zcav2018_1_L${i}.txt 		        			\
+## 		--renz_1 hindIII --renz_2 mspI 								                        	\
+## 		-t 110			 										                                    		\
+## 		-r -q -c -D											                                  			\
+## 		-i gzfastq -y gzfastq
+
+## ##rename log file so that it isn't rewritten each time the code is run
+
+## mv ./cleaned/0_mismatch/process_radtags.Zcav2018_1.log ./cleaned/0_mismatch/Zcav2018_1_L${i}_process_radtags.log
+
+
+The results from process_radtags output into a log that gives sequence information for the library as a whole as well as individuals. 
+
+Example logfile from process_radtags:
+
+## File	Retained Reads	Low Quality	Ambiguous Barcodes	Ambiguous RAD-Tag	Total
+## BWLib_L6_R1.fastq.gz	35088776	30613	128700	13616895	48864984
+
+## Total Sequences	48864984
+## Ambiguous Barcodes	128700
+## Low Quality	30613
+## Ambiguous RAD-Tag	13616895
+## Retained Reads	35088776
+
+## Barcode	Filename	Total	NoRadTag	LowQuality	Retained
+## GCATG	BWLib_L6_Zcav_9	11966906	15474	12386	11939046
+## ATTACA	BWLib_L6_Zcav_10	9707148	11972	9997	9685179
+## AGTTAA	BWLib_L6_Zcav_11	6679676	3346180	2045	3331451
+## AGTCAA	BWLib_L6_Zcav_12	3408166	1707708	1018	1699440
+## AGTGTT	BWLib_L6_Zcav_13	7993114	4006671	2411	3984032
+## CACGAC	BWLib_L6_Zcav_14	8981274	4528890	2756	4449628
+
+3. ref_align
+
+In this step, QC and demultiplexed reads from process_tags are aligned to the reference genome. In the first stage of analysis, this will likely be done on a subset of individuals for optimising parameters. This code is run on the command line using the module bwa and the command "bwa mem". 
+
+Example code for aligning sequences to a reference genome taken from inside a loop:
+
+## # align paired end reads to SRW genome
+## 		bwa mem ~/bw_bioinformatics/bw_ddrad/genome/Mbid.genome.fasta -t 5        \
+## ~/bw_bioinformatics/bw_ddrad/cleaned/1_mismatch/Zcav/$opt.1.fq.gz            \
+## ~/bw_bioinformatics/bw_ddrad/cleaned/1_mismatch/Zcav/$opt.2.fq.gz            \
+## >~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_mbid/med/${opt}_aln.sam  
+
+This will output .sam files for each individual and they are very large (>1GB each)
+
+4. sam_to_bam_sort
+
+This step will use a module called "samtools" to convert the .sam alignment files to .bam format which is much more compressed and thus easier to use in software. This step will also sort the reads for later use in gstacks. 
+
+Example code for converting and sorting files from .sam to .bam taken from inside a loop:
+
+## # convert from sam to bam
+## 			$samtools
+## 			$samtools view -h -S -b ~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_zcav/med/${opt}_aln.sam \
+##        -o ~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_zcav/med/${opt}_aln.bam
+
+## # sort reads using samtools
+## 			$samtools	
+## 			$samtools sort ~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_zcav/med/${opt}_aln.bam \
+## -o ~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_zcav/med/${opt}_alnS.bam
+
+5. add_RG
+
+This step adds Read Groups to the sorted .bam files that include information about the sample id, library and sequencing ID. 
+
+Example code for adding Read Groups to sorted .bam files taken from inside a loop:
+
+## for opt in Zcav20181_L2-17
+
+## 	do
+
+## ##Setting variables for read groups within the filename with splits
+## NAME=$opt
+## LANE=${NAME%_*}
+## LIBRARY=${NAME%-*}
+
+## ## add read groups so that it can be analysed by gstacks without popmap
+## 	java -jar /usr/local/Modules/modulefiles/tools/picard-tools/2.14.1/picard.jar AddOrReplaceReadGroups \
+##       I=~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_zcav/med/${opt}.alnS.bam \
+##       O=~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_zcav/med/${opt}.alnSRG.bam \
+##       RGID=BCB9BKANXX_$LANE \
+##       RGLB=$LIBRARY \
+##       RGPU=BCB9BKANXX \
+##       RGPL=illumina \
+##       RGSM=$NAME
+##       done
+
