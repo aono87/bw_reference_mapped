@@ -1,0 +1,12 @@
+For this step, generate a .txt file for every library containing the barcode sequence and sample name. Be very careful that the barcode sequence is 100% correct and give a uniform naming format to all samples, ie "SequencingLane_Library-SampleNumber". It is best later on if you use both the "_" and "-" symbols within the sample id. Each sample name should be unique and include the sequencing lane, library and some sample specific identifier.
+
+Example barcode file:
+
+GCATG	Mde_L6-41
+AAGTGA	Mde_L6-42
+AGAATGA	Mde_L6-43
+CCACTGG	Mde_L6-44
+AGTCAAGA	Mde_L6-45
+CACGACCA	Mde_L6-46
+
+Save each barcode file with a library specific name and make sure they are tab delimited. 
