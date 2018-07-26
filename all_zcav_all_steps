@@ -1,0 +1,146 @@
+##### This is the exact pipeline that I used to process all of the Z. cavirostris samples after parameter optimisation. 
+#########################################################################
+
+#1.barcodes (these files are saved in the dropbox and cluster. For this part I made sure the sample names would be "SequencingLane_Library-SampleNumber"
+
+#########################################################################
+
+#2.process_radtags (this loop is broken into several because the libraries and sequencing lanes were all a little bit different. 
+
+
+### Submitting a job using a script
+#!/bin/bash
+#$-cwd  ##execute the job from the current working directory
+#$-j y  ##join error output to normal output
+#$-S /bin/bash ##shell where the cluster will run the job
+#$-V ##pass all environment variables to the job
+#$-N ZcavAll ##job name
+#$-q all.q ##default queue, no special requirement
+
+##load stacks v2
+
+module load stacks/2.0Beta9
+
+#########1_mismatch data#################
+
+##1_Mismatch data for Zcav2018 Lanes 1-3 (L1-L15)##
+##demultiplex samples for each library using unique barcodes. 
+##This loop will read each name and corresponding barcode files. 
+##Will output into ./cleaned  folder with unique log files for each
+
+##Zcav 2018 lane 1
+##start loop
+
+echo processing 1_mismatch RAD tags for Zcav lane 1 libraries 1-5
+for i in {1..5}
+	do
+	
+##process radtags code to be run for each Zcav library in Zcav2018_1 (L1-L5)##
+
+process_radtags 														\
+		-1 ./raw/1_mismatch/Zcav2018_1/Zcav2018_1_L${i}_R1.fastq.gz	            \
+       	-2 ./raw/1_mismatch/Zcav2018_1/Zcav2018_1_L${i}_R2.fastq.gz     \
+        -o ./cleaned/1_mismatch/Zcav/								\
+	    -b ./info/barcodes/zcav_barcodes_all/barcode_Zcav2018_1_L${i}.txt 					\
+		--renz_1 hindIII --renz_2 mspI 									\
+		-t 110			 												\
+		-r -q -c -D														\
+		-i gzfastq -y gzfastq
+
+##rename log file so that it isn't rewritten each time the code is run
+
+mv ./cleaned/1_mismatch/Zcav/process_radtags.Zcav2018_1.log ./cleaned/1_mismatch/Zcav_logs/Zcav2018_1_L${i}_process_radtags.log
+
+done
+
+##Zcav 2018 lane 2
+##start loop
+
+echo processing 1_mismatch RAD tags for Zcav lane 2 libraries 6-10
+for i in {6..10}
+	do
+	
+##process radtags code to be run for each Zcav library in Zcav2018_1 (L6-L10)##
+
+process_radtags 														\
+		-1 ./raw/1_mismatch/Zcav2018_2/Zcav2018_2_L${i}_R1.fastq.gz	            \
+       	-2 ./raw/1_mismatch/Zcav2018_2/Zcav2018_2_L${i}_R2.fastq.gz     \
+                -o ./cleaned/1_mismatch/Zcav/								\
+	        -b ./info/barcodes/zcav_barcodes_all/barcode_Zcav2018_2_L${i}.txt 					\
+		--renz_1 hindIII --renz_2 mspI 									\
+		-t 110			 												\
+		-r -q -c -D														\
+		-i gzfastq -y gzfastq
+
+##rename log file so that it isn't rewritten each time the code is run
+
+mv ./cleaned/1_mismatch/Zcav/process_radtags.Zcav2018_2.log ./cleaned/1_mismatch/Zcav_logs/Zcav2018_2_L${i}_process_radtags.log
+
+done
+
+##Zcav 2018 lane 3
+##start loop
+
+echo processing 1_mismatch RAD tags for Zcav lane 3 libraries 11-15
+for i in {11..15}
+	do
+	
+##process radtags code to be run for each Zcav library in Zcav2018_1 (L11-L15)##
+
+process_radtags 														\
+		-1 ./raw/1_mismatch/Zcav2018_3/Zcav2018_3_L${i}_R1.fastq.gz	            \
+       	-2 ./raw/1_mismatch/Zcav2018_3/Zcav2018_3_L${i}_R2.fastq.gz     \
+                -o ./cleaned/1_mismatch/Zcav/ 								\
+	        -b ./info/barcodes/zcav_barcodes_all/barcode_Zcav2018_3_L${i}.txt 					\
+		--renz_1 hindIII --renz_2 mspI 									\
+		-t 110			 												\
+		-r -q -c -D														\
+		-i gzfastq -y gzfastq
+
+##rename log file so that it isn't rewritten each time the code is run
+
+mv ./cleaned/1_mismatch/Zcav/process_radtags.Zcav2018_3.log ./cleaned/1_mismatch/Zcav_logs/Zcav2018_3_L${i}_process_radtags.log
+
+done
+
+##BWLib L3
+
+echo processing 1_mismatch RAD tags for BWLib L3
+	
+##process radtags code to be run for each Zcav library in BWLib (L3)##
+
+process_radtags 														\
+		-1 ./raw/1_mismatch/BWLib_Lane1/BWLib_L3_R1.fastq.gz	            \
+       	-2 ./raw/1_mismatch/BWLib_Lane1/BWLib_L3_R2.fastq.gz     \
+                -o ./cleaned/1_mismatch/Zcav/ 								\
+	        -b ./info/barcodes/zcav_barcodes_all/barcode_BWLib_L3_Zcav.txt						\
+		--renz_1 hindIII --renz_2 mspI 									\
+		-t 110			 												\
+		-r -q -c -D														\
+		-i gzfastq -y gzfastq
+
+##rename log file so that it isn't rewritten each time the code is run
+
+mv ./cleaned/1_mismatch/Zcav/process_radtags.BWLib_Lane1.log ./cleaned/1_mismatch/Zcav_logs/BWLib_Lane1_L3_Zcav.process_radtags.log
+
+##BWLib L6
+
+echo processing 1_mismatch RAD tags for BWLib L6
+	
+##process radtags code to be run for each Zcav library in BWLib (L6)##
+
+process_radtags 														\
+		-1 ./raw/1_mismatch/BWLib_Lane1/BWLib_L6_R1.fastq.gz	            \
+       	-2 ./raw/1_mismatch/BWLib_Lane1/BWLib_L6_R2.fastq.gz     \
+                -o ./cleaned/1_mismatch/Zcav/ 								\
+	        -b ./info/barcodes/zcav_barcodes_all/barcode_BWLib_L6_Zcav.txt						\
+		--renz_1 hindIII --renz_2 mspI 									\
+		-t 110			 												\
+		-r -q -c -D														\
+		-i gzfastq -y gzfastq
+
+##rename log file so that it isn't rewritten each time the code is run
+
+mv ./cleaned/1_mismatch/Zcav/process_radtags.BWLib_Lane1.log ./cleaned/1_mismatch/Zcav_logs/BWLib_Lane1_L6_Zcav.process_radtags.log
+
+######################################################################
