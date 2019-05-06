@@ -1,0 +1,27 @@
+### GSTACKS WITH FINAL 154 ZCAV SAMPLES ALIGNED TO THE ZCAV GENOME ###
+
+
+###gstacks likes file locations to be relative to the directory you are in, not absolute
+
+##These Zcavs were aligned to the Zcav genome
+
+#!/bin/bash 
+#$ -cwd 
+#$ -j y
+#$ -S /bin/bash 
+#$ -V
+#$ -N gstacks_ZCZC_ALL154 ##job name
+#$ -q highmemory.q
+#$ -pe multi 8 
+#$ -l h_vmem=40G
+# the script itself will command 3 processors in parallel, this can be referred to as NSLOTS in the commandline invocation
+
+
+# load 
+#module load stacks
+module load stacks/2.0Beta9
+
+
+
+## analyse single file with gstacks to get alignment and loci statistics
+gstacks -I alignments/zcav_aln_zcav_all/SRG_bam_files/ -M final154_zcav_popmap.txt -O stacks.reference/zcav_aln_zcav_gstacks/ --max-clipped 0.2 --min-mapq 10 --var-alpha 0.05 --gt-alpha 0.05 -t 8
