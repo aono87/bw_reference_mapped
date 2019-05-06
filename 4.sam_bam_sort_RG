@@ -1,1 +1,56 @@
+###convert .sam files to .bam files and sort them. TThis will also add read groups
+
+#Samples: Zcav
+#Genome: Zcav
+#Population: All
+
+################################################################################################################################################
+#!/bin/bash 
+#$ -cwd 
+#$ -j y
+#$ -S /bin/bash 
+#$ -V
+#$ -N Sam-Bam-SRG_ZC_ZC_final154 ## job name
+#$ -q all.q
+#$ -pe multi 8
+#$ -l h_vmem=30G
+
+# load module 
+module load samtools/1.6
+samtools=/shelf/modulefiles/tools/samtools/1.6/bin/samtools
+module load picard-tools
+module load stacks/2.0Beta9
+
+
+##############med samples
+for opt in BWLib_L3-1 BWLib_L3-2 BWLib_L3-3 BWLib_L3-4 BWLib_L3-5 BWLib_L3-6 BWLib_L3-7 BWLib_L3-8 BWLib_L6-10 BWLib_L6-11 BWLib_L6-12 BWLib_L6-13 BWLib_L6-14 BWLib_L6-9 Mde_L6-41 Mde_L6-42 Mde_L6-43 Mde_L6-44 Mde_L6-45 Mde_L6-46 Zcav20181_L1-1  Zcav20181_L1-10 Zcav20181_L1-2 Zcav20181_L1-3 Zcav20181_L1-4 Zcav20181_L1-5 Zcav20181_L1-6 Zcav20181_L1-7 Zcav20181_L1-8 Zcav20181_L1-9 Zcav20181_L2-11 Zcav20181_L2-12 Zcav20181_L2-13 Zcav20181_L2-14 Zcav20181_L2-15 Zcav20181_L2-16 Zcav20181_L2-17  Zcav20181_L2-18 Zcav20181_L2-19 Zcav20181_L2-20 Zcav20181_L3-21  Zcav20181_L3-22 Zcav20181_L3-23 Zcav20181_L3-24 Zcav20181_L3-25 Zcav20181_L3-26 Zcav20181_L3-27 Zcav20181_L3-28 Zcav20181_L3-29 Zcav20181_L3-30  Zcav20181_L4-31 Zcav20181_L4-32 Zcav20181_L4-33 Zcav20181_L4-34 Zcav20181_L4-35 Zcav20181_L4-36 Zcav20181_L4-37 Zcav20181_L4-38 Zcav20181_L4-39  Zcav20181_L4-40 Zcav20181_L5-41 Zcav20181_L5-42 Zcav20181_L5-43 Zcav20181_L5-44 Zcav20181_L5-45 Zcav20181_L5-46 Zcav20181_L5-47 Zcav20181_L5-48  Zcav20181_L5-49 Zcav20181_L5-50 Zcav20182_L10-41 Zcav20182_L10-42 Zcav20182_L10-43 Zcav20182_L10-44 Zcav20182_L10-45 Zcav20182_L10-46 Zcav20182_L10-47 Zcav20182_L10-48 Zcav20182_L10-49 Zcav20182_L10-50 Zcav20182_L6-1 Zcav20182_L6-10 Zcav20182_L6-2 Zcav20182_L6-3 Zcav20182_L6-4  Zcav20182_L6-5 Zcav20182_L6-6 Zcav20182_L6-7 Zcav20182_L6-8 Zcav20182_L6-9 Zcav20182_L7-11 Zcav20182_L7-12 Zcav20182_L7-13 Zcav20182_L7-14  Zcav20182_L7-15 Zcav20182_L7-16 Zcav20182_L7-17 Zcav20182_L7-18 Zcav20182_L7-19 Zcav20182_L7-20 Zcav20182_L8-21 Zcav20182_L8-22 Zcav20182_L8-23 Zcav20182_L8-24 Zcav20182_L8-25 Zcav20182_L8-26 Zcav20182_L8-27 Zcav20182_L8-28 Zcav20182_L8-29 Zcav20182_L8-30 Zcav20182_L9-31 Zcav20182_L9-32  Zcav20182_L9-33 Zcav20182_L9-34 Zcav20182_L9-35 Zcav20182_L9-36 Zcav20182_L9-37 Zcav20182_L9-38 Zcav20182_L9-39 Zcav20182_L9-40 Zcav20183_L11-1  Zcav20183_L11-10 Zcav20183_L11-2 Zcav20183_L11-3 Zcav20183_L11-4 Zcav20183_L11-5 Zcav20183_L11-6 Zcav20183_L11-7 Zcav20183_L11-8 Zcav20183_L11-9 Zcav20183_L12-11 Zcav20183_L12-12 Zcav20183_L12-13 Zcav20183_L12-14 Zcav20183_L12-15 Zcav20183_L12-16 Zcav20183_L12-17 Zcav20183_L12-18 Zcav20183_L12-19 Zcav20183_L12-20 Zcav20183_L13-21 Zcav20183_L13-22 Zcav20183_L13-23 Zcav20183_L13-24 Zcav20183_L13-25 Zcav20183_L13-26 Zcav20183_L13-27 Zcav20183_L13-28 Zcav20183_L13-29 Zcav20183_L13-30 Zcav20183_L14-31 Zcav20183_L14-32 Zcav20183_L14-33 Zcav20183_L14-34 Zcav20183_L14-35 Zcav20183_L14-36 Zcav20183_L14-37 Zcav20183_L14-38 Zcav20183_L14-39 Zcav20183_L14-40 Zcav20183_L15-41 Zcav20183_L15-42 Zcav20183_L15-43 Zcav20183_L15-44 Zcav20183_L15-45 Zcav20183_L15-46 Zcav20183_L15-47  Zcav20183_L15-48 Zcav20183_L15-49 Zcav20183_L15-50
+	
+	do
+#print name of sample analysing
+			echo now analysing $opt
+
+
+# convert from sam to bam
+			$samtools
+			$samtools view -h -S -b ~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_zcav_all/sam_files/${opt}.aln.sam -o ~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_zcav_all/bam_files/${opt}.aln.bam
+
+# sort reads using samtools
+			$samtools	
+			$samtools sort ~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_zcav_all/bam_files/${opt}.aln.bam -o ~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_zcav_all/bam_files/${opt}.alnS.bam
+
+##Setting variables for read groups within the filename with splits
+NAME=$opt
+LANE=${NAME%_*}
+LIBRARY=${NAME%-*}
+
+## add read groups so that it can be analysed by gstacks without popmap
+	java -jar /usr/local/Modules/modulefiles/tools/picard-tools/2.14.1/picard.jar AddOrReplaceReadGroups \
+      I=~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_zcav_all/bam_files/${opt}.alnS.bam \
+      O=~/bw_bioinformatics/bw_ddrad/alignments/zcav_aln_zcav_all/SRG_bam_files/${opt}.bam \
+      RGID=BCB9BKANXX_$LANE \
+      RGLB=$LIBRARY \
+      RGPU=BCB9BKANXX \
+      RGPL=illumina \
+      RGSM=$NAME
+done
 
