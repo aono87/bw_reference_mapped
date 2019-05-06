@@ -1,0 +1,21 @@
+####Populations code for Z. cavirostris (Z. cavirostris genome) samples######
+###this will pool all samples together, not separate them by population!
+
+#!/bin/bash 
+#$ -cwd 
+#$ -j y
+#$ -S /bin/bash 
+#$ -V
+#$ -N populations_zczc_samples ##job name
+#$ -q all.q
+#$ -pe multi 8 # the script itself will command 3 processors in parallel, this can be referred to as NSLOTS in the commandline invocation
+#$ -l h_vmem=60G
+
+
+## load programs, 
+module load stacks/2.0Beta9	
+
+## use populations to pull all loci called by gstacks that are variable; minor allele frequency of 0.01 means that at least one individual in 54 has a variable site. This is just the beginning, so it's just to get the variable loci. The popmap file has 154 reference samples in it
+
+							
+populations -P ./stacks.reference/zcav_aln_zcav_gstacks/ -O ./stacks.reference/zcav_aln_zcav_populations_1enz/sample_level --vcf -t 8 --min_maf 0.01 --merge_sites --renz hindIII
