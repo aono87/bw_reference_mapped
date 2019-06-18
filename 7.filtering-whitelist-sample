@@ -1,0 +1,42 @@
+##this script makes use of both Stacks in a linux environment as well as R. You will need to make a separate R script for the plotting. In some cases, i cound it easier to download the vcf file to my local computer and run the r steps in R studio but its up to you!
+
+####All filtering steps in R code for Z. cavirostris samples######
+
+#!/bin/bash 
+#$ -cwd 
+#$ -j y
+#$ -S /bin/bash 
+#$ -V
+#$ -N filter-whitelist_zczc_3runs ##job name
+#$ -q all.q
+#$ -pe multi 8 # the script itself will command 3 processors in parallel, this can be referred to as NSLOTS in the commandline invocation
+#$ -l h_vmem=40G
+
+module load vcflib/gitv0_e3ab177
+module load dDocent/gitv0_7dea314
+module unload vcftools/0.1.11
+module load vcftools/0.1.12a
+module unload stacks/1.40
+module load stacks/2.0Beta9
+
+
+
+
+							
+							## make directory to hold output
+							mkdir ./stacks.reference/zcav_aln_zcav_populations_1enz/postqc/
+
+							
+							
+
+
+###change locations to the directory where the files are located for each set of parameters
+cd ~/bw_bioinformatics/bw_ddrad/stacks.reference/zcav_aln_zcav_populations_1enz/
+
+## switch to R and load programs needed
+
+R
+
+##Run filtering steps R script
+Rscript ~/bw_bioinformatics/bw_ddrad/all_filtering_steps_zc.R
+
